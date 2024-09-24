@@ -1,0 +1,34 @@
+package:
+  name: open-foreign-generic
+  dependencies:
+    - "arrays"
+    - "assert"
+    - "bifunctors"
+    - "console"
+    - "control"
+    - "effect"
+    - "either"
+    - "exceptions"
+    - "foldable-traversable"
+    - "foreign"
+    - "foreign-object"
+    - "identity"
+    - "lists"
+    - "maybe"
+    - "newtype"
+    - "partial"
+    - "prelude"
+    - "record"
+    - "strings"
+    - "transformers"
+    - "tuples"
+    - "typelevel-prelude"
+    - "unsafe-coerce"
+    - "ordered-collections"
+  test:
+    main: Test.Main
+    dependencies: []
+workspace:
+  packageSet:
+    registry: 60.0.1
+  extraPackages: {}
