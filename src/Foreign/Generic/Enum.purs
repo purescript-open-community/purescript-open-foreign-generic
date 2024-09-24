@@ -8,7 +8,7 @@ import Data.Symbol (class IsSymbol, reflectSymbol)
 import Foreign (F, Foreign, ForeignError(..), fail, readString, unsafeToForeign)
 import Partial.Unsafe (unsafeCrashWith)
 import Prim.TypeError (class Fail, Text)
-import Type.Prelude (Proxy(..))
+import Type.Proxy (Proxy(..))
 
 type GenericEnumOptions =
   { constructorTagTransform :: String -> String

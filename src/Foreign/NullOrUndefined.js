@@ -1,2 +1,2 @@
-export const nullImpl = null;
-export const undefinedImpl = undefined;
+export const aNull = null;
+export const anUndefined = undefined;

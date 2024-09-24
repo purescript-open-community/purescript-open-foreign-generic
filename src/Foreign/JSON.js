@@ -1,5 +1,1 @@
-"use strict";
-
-export function parseJSONImpl(str) {
-  return JSON.parse(str);
-}
+export const parseJSONImpl = (str) => JSON.parse(str);

@@ -7,9 +7,8 @@ import Control.Bind (bindFlipped)
 import Control.Monad.Except (except, mapExcept)
 import Data.Array ((..), zipWith, length)
 import Data.Bifunctor (lmap)
-import Data.Either (Either(..), either)
+import Data.Either (Either(..))
 import Data.Generic.Rep (Argument(..), Constructor(..), NoArguments(..), NoConstructors, Product(..), Sum(..))
-import Data.Generic.Rep (class Generic, from, to)
 import Data.Identity (Identity(..))
 import Data.List (List(..), (:))
 import Data.List as List
@@ -17,13 +16,13 @@ import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (unwrap)
 import Data.Set (Set)
 import Data.Set as Set
-import Data.Symbol (class IsSymbol, SProxy(..), reflectSymbol)
+import Data.Symbol (class IsSymbol, reflectSymbol)
 import Data.Traversable (sequence)
 import Data.Tuple (Tuple(..))
 import Foreign (F, Foreign, ForeignError(..), fail, readArray, readBoolean, readChar, readInt, readNumber, readString, unsafeToForeign)
 import Foreign.Generic.Internal (readObject)
 import Foreign.Index (index, readProp)
-import Foreign.NullOrUndefined (readNullOrUndefined, null)
+import Foreign.NullOrUndefined (readNullOrUndefined, aNull)
 import Foreign.Object (Object)
 import Foreign.Object as Object
 import Prim.Row (class Cons, class Lacks)
@@ -33,6 +32,9 @@ import Record.Builder (Builder)
 import Record.Builder as Builder
 import Type.Proxy (Proxy(..))
 import Unsafe.Coerce (unsafeCoerce)
+
+newtype Poly a = Poly a
+derive newtype instance eqPoly :: Eq a => Eq (Poly a)
 
 -- | Encoding/Decoding options which can be used to customize
 -- | `Decode` and `Encode` instances which are derived via
@@ -155,6 +157,9 @@ instance objectDecode :: Decode v => Decode (Object v) where
 instance recordDecode :: (RowToList r rl, DecodeRecord r rl) => Decode (Record r) where
   decode = decodeWithOptions defaultOptions
 
+instance polyDecode :: Decode a => Decode (Poly a) where
+  decode = map Poly <<< decode
+
 -- | The `Encode` class is used to generate encoding functions
 -- | of the form `a -> Foreign` using `generics-rep` deriving.
 -- |
@@ -207,7 +212,7 @@ instance setEncode :: (Encode a, Ord a) => Encode (Set a) where
   encode = (Set.toUnfoldable :: Set a -> Array a) >>> encode
 
 instance maybeEncode :: Encode a => Encode (Maybe a) where
-  encode = maybe null encode
+  encode = maybe aNull encode
 
 instance eitherEncode :: (Encode a, Encode b) => Encode (Either a b) where
   encode = case _ of
@@ -222,6 +227,9 @@ instance objectEncode :: Encode v => Encode (Object v) where
 
 instance recordEncode :: (RowToList r rl, EncodeRecord r rl) => Encode (Record r) where
   encode = encodeWithOptions defaultOptions
+
+instance polyEncode :: Encode a => Encode (Poly a) where
+  encode (Poly a) = encode a
 
 -- | When deriving `En`/`Decode` instances using `Generic`, we want
 -- | the `Options` object to apply to the outermost record type(s)
@@ -241,11 +249,15 @@ class EncodeWithOptions a where
 
 instance decodeWithOptionsRecord :: (RowToList r rl, DecodeRecord r rl) => DecodeWithOptions (Record r) where
   decodeWithOptions opts = map (flip Builder.build {}) <$> decodeRecordWithOptions (Proxy :: Proxy rl) opts
+else instance decodeWithOptionsPoly :: Decode a => DecodeWithOptions (Poly a) where
+  decodeWithOptions _ = decode
 else instance decodeWithOptionsOther :: Decode a => DecodeWithOptions a where
   decodeWithOptions _ = decode
 
 instance encodeWithOptionsRecord :: (RowToList r rl, EncodeRecord r rl) => EncodeWithOptions (Record r) where
   encodeWithOptions opts = unsafeToForeign <<< encodeRecordWithOptions (Proxy :: Proxy rl) opts
+else instance encodeWithOptionsPoly :: Encode a => EncodeWithOptions (Poly a) where
+  encodeWithOptions _ = encode
 else instance encodeWithOptionsOther :: Encode a => EncodeWithOptions a where
   encodeWithOptions _ = encode
 

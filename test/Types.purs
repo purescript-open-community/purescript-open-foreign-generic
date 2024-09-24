@@ -9,9 +9,10 @@ import Data.Maybe (Maybe)
 import Data.Show.Generic (genericShow)
 import Data.Tuple (Tuple(..))
 import Foreign (ForeignError(..), fail, readArray, unsafeToForeign)
-import Foreign.Generic (genericDecode, genericEncode)
-import Foreign.Generic.Class (class Decode, class DecodeWithOptions, class Encode, class EncodeWithOptions, SumEncoding(..), Options, decode, defaultOptions, encode)
+import Foreign.Generic (class Encode, class Decode, Options, SumEncoding(..), encode, decode, defaultOptions, genericDecode, genericEncode)
+import Foreign.Generic.Class (Poly(..))
 import Foreign.Generic.EnumEncoding (defaultGenericEnumOptions, genericDecodeEnum, genericEncodeEnum)
+import Safe.Coerce (coerce)
 
 newtype TupleArray a b = TupleArray (Tuple a b)
 
@@ -95,11 +96,11 @@ instance showTree :: Show a => Show (Tree a) where
 instance eqTree :: Eq a => Eq (Tree a) where
   eq x y = genericEq x y
 
-instance decodeTree :: (Decode a, DecodeWithOptions a) => Decode (Tree a) where
-  decode x = genericDecode defaultOptions x
+instance decodeTree :: Decode a => Decode (Tree a) where
+  decode x = (coerce :: Tree (Poly a) -> Tree a) <$> genericDecode defaultOptions x
 
-instance encodeTree :: (Encode a, EncodeWithOptions a) => Encode (Tree a) where
-  encode x = genericEncode defaultOptions x
+instance Encode a => Encode (Tree a) where
+  encode x = genericEncode defaultOptions ((coerce :: Tree a -> Tree (Poly a)) x)
 
 newtype UndefinedTest = UndefinedTest
   { a :: Maybe String

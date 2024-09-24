@@ -1,3 +1,1 @@
-export function unsafeStringify(x) {
-  return JSON.stringify(x);
-}
+export const unsafeStringify = (x) => JSON.stringify(x);
