@@ -4,9 +4,7 @@ workspace:
       path: ./
       dependencies:
         - arrays
-        - assert
         - bifunctors
-        - console
         - control
         - effect
         - either
@@ -22,17 +20,13 @@ workspace:
         - partial
         - prelude
         - record
-        - strings
         - transformers
         - tuples
-        - typelevel-prelude
         - unsafe-coerce
       test_dependencies: []
       build_plan:
         - arrays
-        - assert
         - bifunctors
-        - console
         - const
         - contravariant
         - control
@@ -602,14 +596,6 @@ packages:
       - tuples
       - unfoldable
       - unsafe-coerce
-  assert:
-    type: registry
-    version: 6.0.0
-    integrity: sha256-hCSYcCw9kj3qujoDcriWhCdmrpPZoguSPDZhEMnTl3A=
-    dependencies:
-      - console
-      - effect
-      - prelude
   bifunctors:
     type: registry
     version: 6.0.0
@@ -620,13 +606,6 @@ packages:
       - newtype
       - prelude
       - tuples
-  console:
-    type: registry
-    version: 6.1.0
-    integrity: sha256-CxmAzjgyuGDmt9FZW51VhV6rBPwR6o0YeKUzA9rSzcM=
-    dependencies:
-      - effect
-      - prelude
   const:
     type: registry
     version: 6.0.0
