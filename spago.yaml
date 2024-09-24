@@ -1,10 +1,10 @@
 package:
   publish:
-    version: 11.0.1
+    version: 11.0.2
     license: "MIT"
     location:
       githubOwner: purescript-open-community
-      githubRepo: open-foreign-generic
+      githubRepo: purescript-open-foreign-generic
   name: open-foreign-generic
   dependencies:
     - arrays: ">=7.3.0 <8.0.0"
