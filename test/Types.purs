@@ -30,11 +30,11 @@ instance decodeTupleArray :: (Decode a, Decode b) => Decode (TupleArray a b) whe
   decode x = do
     arr <- readArray x
     case arr of
-      [y, z] -> TupleArray <$> (Tuple <$> decode y <*> decode z)
+      [ y, z ] -> TupleArray <$> (Tuple <$> decode y <*> decode z)
       _ -> fail (ForeignError "Expected two array elements")
 
 instance encodeTupleArray :: (Encode a, Encode b) => Encode (TupleArray a b) where
-  encode (TupleArray (Tuple a b)) = unsafeToForeign [encode a, encode b]
+  encode (TupleArray (Tuple a b)) = unsafeToForeign [ encode a, encode b ]
 
 -- | An example record
 newtype RecordTest = RecordTest
@@ -70,14 +70,16 @@ instance eqIntList :: Eq IntList where
 
 intListOptions :: Options
 intListOptions =
-  defaultOptions { unwrapSingleConstructors = true
-                 , sumEncoding = TaggedObject { tagFieldName: "tag"
-                                               , contentsFieldName: "contents"
-                                               , constructorTagTransform: \tag -> case tag of
-                                                                                    "Cons" -> "cOnS"
-                                                                                    _ -> ""
-                                               }
-                 }
+  defaultOptions
+    { unwrapSingleConstructors = true
+    , sumEncoding = TaggedObject
+        { tagFieldName: "tag"
+        , contentsFieldName: "contents"
+        , constructorTagTransform: \tag -> case tag of
+            "Cons" -> "cOnS"
+            _ -> ""
+        }
+    }
 
 instance decodeIntList :: Decode IntList where
   decode x = genericDecode intListOptions x
@@ -111,6 +113,7 @@ derive instance geUT :: Generic UndefinedTest _
 
 instance dUT :: Decode UndefinedTest where
   decode = genericDecode $ defaultOptions
+
 instance eUT :: Encode UndefinedTest where
   encode = genericEncode $ defaultOptions
 
@@ -124,5 +127,6 @@ derive instance geFruit :: Generic Fruit _
 
 instance dFruit :: Decode Fruit where
   decode = genericDecodeEnum defaultGenericEnumOptions
+
 instance eFruit :: Encode Fruit where
   encode = genericEncodeEnum defaultGenericEnumOptions

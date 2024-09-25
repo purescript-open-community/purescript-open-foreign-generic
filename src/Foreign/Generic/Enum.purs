@@ -64,51 +64,55 @@ class GenericDecodeEnum a where
 class GenericEncodeEnum a where
   encodeEnum :: GenericEnumOptions -> a -> Foreign
 
-instance sumGenericDecodeEnum
-  :: (GenericDecodeEnum a, GenericDecodeEnum b)
-  => GenericDecodeEnum (Sum a b) where
+instance sumGenericDecodeEnum ::
+  ( GenericDecodeEnum a
+  , GenericDecodeEnum b
+  ) =>
+  GenericDecodeEnum (Sum a b) where
   decodeEnum opts f = Inl <$> decodeEnum opts f <|> Inr <$> decodeEnum opts f
 
-instance ctorNoArgsGenericDecodeEnum
-  :: IsSymbol name
-  => GenericDecodeEnum (Constructor name NoArguments) where
-  decodeEnum {constructorTagTransform} f = do
+instance ctorNoArgsGenericDecodeEnum ::
+  IsSymbol name =>
+  GenericDecodeEnum (Constructor name NoArguments) where
+  decodeEnum { constructorTagTransform } f = do
     tag <- readString f
     unless (tag == ctorName) $
       fail (ForeignError ("Expected " <> show ctorName <> " tag for unary constructor literal " <> ctorName))
     pure $ Constructor NoArguments
     where
-      ctorName = constructorTagTransform $ reflectSymbol (Proxy :: Proxy name)
+    ctorName = constructorTagTransform $ reflectSymbol (Proxy :: Proxy name)
 
-instance ctorArgumentGenericDecodeEnum
-  :: Fail (Text "genericEncode/DecodeEnum cannot be used on types that are not sums of constructors with no arguments.")
-  => GenericDecodeEnum (Constructor name (Argument a)) where
+instance ctorArgumentGenericDecodeEnum ::
+  Fail (Text "genericEncode/DecodeEnum cannot be used on types that are not sums of constructors with no arguments.") =>
+  GenericDecodeEnum (Constructor name (Argument a)) where
   decodeEnum _ _ = unsafeCrashWith "unreachable decodeEnum was reached."
 
-instance ctorProductGenericDecodeEnum
-  :: Fail (Text "genericEncode/DecodeEnum cannot be used on types that are not sums of constructors with no arguments.")
-  => GenericDecodeEnum (Constructor name (Product a b)) where
+instance ctorProductGenericDecodeEnum ::
+  Fail (Text "genericEncode/DecodeEnum cannot be used on types that are not sums of constructors with no arguments.") =>
+  GenericDecodeEnum (Constructor name (Product a b)) where
   decodeEnum _ _ = unsafeCrashWith "unreachable decodeEnum was reached."
 
-instance sumGenericEncodeEnum
-  :: (GenericEncodeEnum a, GenericEncodeEnum b)
-  => GenericEncodeEnum (Sum a b) where
+instance sumGenericEncodeEnum ::
+  ( GenericEncodeEnum a
+  , GenericEncodeEnum b
+  ) =>
+  GenericEncodeEnum (Sum a b) where
   encodeEnum opts (Inl a) = encodeEnum opts a
   encodeEnum opts (Inr b) = encodeEnum opts b
 
-instance ctorNoArgsGenericEncodeEnum
-  :: IsSymbol name
-  => GenericEncodeEnum (Constructor name NoArguments) where
-  encodeEnum {constructorTagTransform} _ = unsafeToForeign ctorName
+instance ctorNoArgsGenericEncodeEnum ::
+  IsSymbol name =>
+  GenericEncodeEnum (Constructor name NoArguments) where
+  encodeEnum { constructorTagTransform } _ = unsafeToForeign ctorName
     where
-      ctorName = constructorTagTransform $ reflectSymbol (Proxy :: Proxy name)
+    ctorName = constructorTagTransform $ reflectSymbol (Proxy :: Proxy name)
 
-instance ctorArgumentGenericEncodeEnum
-  :: Fail (Text "genericEncode/DecodeEnum cannot be used on types that are not sums of constructors with no arguments.")
-  => GenericEncodeEnum (Constructor name (Argument a)) where
+instance ctorArgumentGenericEncodeEnum ::
+  Fail (Text "genericEncode/DecodeEnum cannot be used on types that are not sums of constructors with no arguments.") =>
+  GenericEncodeEnum (Constructor name (Argument a)) where
   encodeEnum _ _ = unsafeCrashWith "unreachable encodeEnum was reached."
 
-instance ctorProductGenericEncodeEnum
-  :: Fail (Text "genericEncode/DecodeEnum cannot be used on types that are not sums of constructors with no arguments.")
-  => GenericEncodeEnum (Constructor name (Product a b)) where
+instance ctorProductGenericEncodeEnum ::
+  Fail (Text "genericEncode/DecodeEnum cannot be used on types that are not sums of constructors with no arguments.") =>
+  GenericEncodeEnum (Constructor name (Product a b)) where
   encodeEnum _ _ = unsafeCrashWith "unreachable encodeEnum was reached."

@@ -80,31 +80,32 @@ testOption options string value = do
     Right (Tuple x y) -> assert (value == y && value == x)
     Left err -> throw (show err)
   where
-    decode' = genericDecodeEnum options <=< parseJSON
+  decode' = genericDecodeEnum options <=< parseJSON
 
 testUnaryConstructorLiteral :: Effect Unit
 testUnaryConstructorLiteral = do
-    testOption (makeCasingOptions toUpper) "\"FRIKANDEL\"" Frikandel
-    testOption (makeCasingOptions toLower) "\"frikandel\"" Frikandel
+  testOption (makeCasingOptions toUpper) "\"FRIKANDEL\"" Frikandel
+  testOption (makeCasingOptions toLower) "\"frikandel\"" Frikandel
   where
-    makeCasingOptions f =
-      { constructorTagTransform: f
-      }
+  makeCasingOptions f =
+    { constructorTagTransform: f
+    }
 
 -- Test that `Nothing` record fields, when encoded to JSON, are present and
 -- encoded as `null`
 testNothingToNull :: Effect Unit
 testNothingToNull =
   let
-    json = encode (UndefinedTest {a: Nothing})
-  in do
-    log (encodeJSON json)
-    case runExcept (pure json >>= readProp "contents" >>= readProp "a") of
-      Right val ->
-        when (not (isNull val))
-          (throw ("property 'a' was not null; got: " <> encodeJSON val))
-      Left err ->
-        throw (show err)
+    json = encode (UndefinedTest { a: Nothing })
+  in
+    do
+      log (encodeJSON json)
+      case runExcept (pure json >>= readProp "contents" >>= readProp "a") of
+        Right val ->
+          when (not (isNull val))
+            (throw ("property 'a' was not null; got: " <> encodeJSON val))
+        Left err ->
+          throw (show err)
 
 -- Test that `Maybe` fields which are not present in the JSON are decoded to
 -- `Nothing`
@@ -112,9 +113,9 @@ testNothingFromMissing :: Effect Unit
 testNothingFromMissing =
   let
     json = unsafeToForeign
-            { tag: "UndefinedTest"
-            , contents: 0
-            }
+      { tag: "UndefinedTest"
+      , contents: 0
+      }
   in
     case runExcept (decode json) of
       Right (UndefinedTest x) ->
@@ -127,15 +128,15 @@ main :: Effect Unit
 main = do
   testRoundTrip (RecordTest { foo: 1, bar: "test", baz: 'a' })
   testRoundTrip (Cons 1 (Cons 2 (Cons 3 Nil)))
-  testRoundTrip (UndefinedTest {a: Just "test"})
-  testRoundTrip (UndefinedTest {a: Nothing})
-  testRoundTrip [Just "test"]
-  testRoundTrip [Nothing :: Maybe String]
+  testRoundTrip (UndefinedTest { a: Just "test" })
+  testRoundTrip (UndefinedTest { a: Nothing })
+  testRoundTrip [ Just "test" ]
+  testRoundTrip [ Nothing :: Maybe String ]
   testRoundTrip (Apple)
-  testRoundTrip (Poly {foo : "foo"})
+  testRoundTrip (Poly { foo: "foo" })
   testRoundTrip (makeTree 0)
   testRoundTrip (makeTree 5)
-  testRoundTrip (Object.fromFoldable [Tuple "one" 1, Tuple "two" 2])
+  testRoundTrip (Object.fromFoldable [ Tuple "one" 1, Tuple "two" 2 ])
   testUnaryConstructorLiteral
   let opts = defaultOptions { fieldTransform = toUpper }
   testGenericRoundTrip opts (RecordTest { foo: 1, bar: "test", baz: 'a' })

@@ -29,7 +29,9 @@ package:
     - unsafe-coerce: ">=6.0.0 <7.0.0"
   test:
     main: Test.Main
-    dependencies: []
+    dependencies:
+      - console
+      - assert
 workspace:
   packageSet:
     registry: 60.0.1

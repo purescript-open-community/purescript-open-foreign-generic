@@ -18,11 +18,11 @@ foreign import parseJSONImpl :: EffectFn1 String Foreign
 parseJSON :: String -> F Foreign
 parseJSON =
   ExceptT
-  <<< Identity
-  <<< lmap (pure <<< ForeignError <<< message)
-  <<< unsafePerformEffect
-  <<< try
-  <<< runEffectFn1 parseJSONImpl
+    <<< Identity
+    <<< lmap (pure <<< ForeignError <<< message)
+    <<< unsafePerformEffect
+    <<< try
+    <<< runEffectFn1 parseJSONImpl
 
 decodeJSONWith :: forall a. (Foreign -> F a) -> String -> F a
 decodeJSONWith f = f <=< parseJSON
