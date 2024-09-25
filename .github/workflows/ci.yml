@@ -35,10 +35,10 @@ jobs:
         run: spago install
 
       - name: Build source
-        run: spago build --no-install
+        run: spago build
 
       - name: Run tests
-        run: spago test --no-install
+        run: spago test
 
       - name: Verify formatting
         run: purs-tidy check src test
