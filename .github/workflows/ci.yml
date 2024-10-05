@@ -1,13 +1,9 @@
-# adapted from https://github.com/purescript-contrib/purescript-argonaut-generic/blob/d211820cfec5c7cf2caa20dc6dc293671949b55c/.github/workflows/ci.yml
-name: Purescript example
+name: CI
 
 on:
   push:
-    branches:
-      - "**"
-    paths-ignore: []
+    branches: [master]
   pull_request:
-    paths-ignore: []
 
 jobs:
   build:
@@ -16,9 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up a PureScript toolchain
-        uses: purescript-contrib/setup-purescript@main
-        with: # https://github.com/purescript-contrib/setup-purescript#specify-versions
+      - uses: purescript-contrib/setup-purescript@main
+        with:
           purescript: "latest"
           purs-tidy: "latest"
           spago: "unstable"
@@ -31,14 +26,11 @@ jobs:
             .spago
             output
 
-      - name: Install dependencies
-        run: spago install
-
       - name: Build source
-        run: spago build
+        run: spago build --censor-stats --strict --pedantic-packages
 
       - name: Run tests
-        run: spago test
+        run: spago test --censor-stats --strict --pedantic-packages
 
       - name: Verify formatting
         run: purs-tidy check src test

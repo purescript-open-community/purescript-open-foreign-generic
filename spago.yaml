@@ -30,9 +30,11 @@ package:
   test:
     main: Test.Main
     dependencies:
-      - console
       - assert
+      - console
+      - safe-coerce
+      - strings
 workspace:
   packageSet:
-    registry: 60.0.1
+    registry: 60.2.1
   extraPackages: {}
