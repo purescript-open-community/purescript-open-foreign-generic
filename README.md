@@ -1,4 +1,4 @@
-# purescript-foreign-generic
+# purescript-open-foreign-generic
 
 [![Build Status](https://github.com/paf31/purescript-foreign-generic/actions/workflows/ci.yml/badge.svg)](https://github.com/paf31/purescript-foreign-generic/actions/workflows/ci.yml)
 
